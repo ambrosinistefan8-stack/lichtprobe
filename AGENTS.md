@@ -1,8 +1,17 @@
 # Lichtprobe project instructions
 
-- Keep the app usable from a local `index.html` without a network dependency.
-- Treat imported JSON as untrusted data and display it as text. Check the schema and file limit before processing.
-- Failed tests, missing preview evidence, or an unresolved review must block release. A passing run must still wait for a human decision.
-- Keep motion optional through the user's reduced-motion setting. Sound requires the user's explicit click.
-- Use synthetic examples. Keep credentials, local workspace paths and other projects out of the repository.
-- Run `node --test tests.cjs` before requesting review. Record observed test and review results separately.
+Lichtprobe is a browser-based release rehearsal. It turns preview, test results, independent review, and a final human decision into a record a small team can inspect and export.
+
+## Run and verify
+
+- Open `index.html` in a modern browser. No server or build step is needed.
+- Run `node --test tests.cjs capture-report.test.cjs` with Node.js 24 or later.
+- Run `node capture-report.cjs report.json` to generate real local test evidence. Use `--preview-checked` only after inspecting the preview. Import the new JSON and try both the failed and passing browser paths.
+- Record the observed local test results and the independent code review separately.
+
+## Project rules
+
+1. **Keep each failure in the evidence.** In `capture-report.cjs`, capture failed nested tests and independent suite failures and avoid counting the same aggregate failure twice. A passing top-level test must never make an incomplete run look successful.
+2. **Keep the final decision human.** In `model.js` and `app.js`, missing preview evidence, failed tests, or a pending or rejected review block release. Record the independent review with a reference and require a separate manual action to approve the rehearsal.
+3. **Keep the lab offline and safe to share.** Display imported JSON as text after validating its size and schema. Use synthetic examples and keep credentials, private data, and local paths out of demos and the repository. The browser must work directly from `index.html` without a network dependency.
+4. **Let the user control movement and sound.** Honour reduced motion in the rehearsal and require an explicit click before soundtrack playback. The same checks and controls must be usable with a keyboard.
