@@ -4,8 +4,10 @@ const { run } = require('node:test');
 const { validate } = require('./model.js');
 
 async function main() {
-  const destination = process.argv[2];
-  if (!destination || path.extname(destination).toLowerCase() !== '.json') {
+  const [destination, flag, ...surplus] = process.argv.slice(2);
+  const previewChecked = flag === '--preview-checked';
+  if (!destination || destination.startsWith('-') || path.extname(destination).toLowerCase() !== '.json'
+      || (flag !== undefined && !previewChecked) || surplus.length > 0) {
     throw new Error('Use node capture-report.cjs report.json [--preview-checked]');
   }
   const stream = run({ files: [path.join(__dirname, 'tests.cjs')] });
@@ -32,7 +34,7 @@ async function main() {
   }
   const report = validate({
     name: 'Lichtprobe – Node-Testlauf',
-    preview: process.argv.includes('--preview-checked'),
+    preview: previewChecked,
     review: 'pending',
     tests
   });
