@@ -8,6 +8,6 @@ Run `node --test tests.cjs capture-report.test.cjs` to verify the release gate a
 
 ## Import a fresh local test report
 
-Run `node capture-report.cjs report.json` and import that file into Lichtprobe. Use `--preview-checked` only after actually checking the preview. Existing output files are preserved.
+Run `node capture-report.cjs report.json` and import that file into Lichtprobe. After actually checking the preview, you can add `--preview-checked` once after the filename. Invalid arguments leave the output untouched. Existing output files are preserved.
 
 Play the report to see the pending review. Once an independent reviewer has decided, enter the reference and their decision under **Review erfassen**. If the preview, tests and review all pass, the operator can then select **Im Labor freigeben** as a separate step. The exported report includes the review reference. Lichtprobe records the review the operator enters, and relies on the operator to verify its source.
