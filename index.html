@@ -38,6 +38,17 @@
           <option value="waiting">C · Review ausstehend</option>
         </select>
         <ol class="timeline" id="timeline" aria-label="Prüfschritte"></ol>
+        <form id="review-form" hidden>
+          <label for="review-reference">Referenz des unabhängigen Reviews</label>
+          <input id="review-reference" name="review-reference" type="text" required maxlength="160" placeholder="z. B. Pull Request #12">
+          <label for="review-decision">Review-Entscheid</label>
+          <select id="review-decision" required>
+            <option value="">Entscheid auswählen</option>
+            <option value="approved">Review bestätigt</option>
+            <option value="changes">Änderungen verlangt</option>
+          </select>
+          <button type="submit" class="secondary">Review erfassen</button>
+        </form>
         <button type="button" class="primary" id="run">Prüflauf abspielen <span aria-hidden="true">▶</span></button>
         <button type="button" class="secondary" id="approve" disabled>Im Labor freigeben</button>
         <p id="status" role="status" aria-live="polite">Wähle ein Beispiel und starte den Prüflauf.</p>

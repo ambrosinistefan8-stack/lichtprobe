@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { inspect, validate, presets } = require('./model.js');
+const { inspect, validate, recordReview, presets } = require('./model.js');
 
 test('a clean run waits for a human decision', () => {
   const before = inspect(presets.ready);
@@ -26,4 +26,16 @@ test('missing preview and malformed or empty test evidence are rejected', () => 
   assert.equal(inspect({ ...presets.ready, preview: false }, true).isApproved, false);
   assert.throws(() => validate({ ...presets.ready, tests: [] }));
   assert.throws(() => validate({ ...presets.ready, tests: [{ name: 'fake', passed: 'yes' }] }));
+});
+
+test('recording an independent review preserves its reference and still requires human approval', () => {
+  assert.throws(() => recordReview(presets.waiting, 'approved', ' '));
+  assert.throws(() => recordReview(presets.waiting, 'pending', 'PR #12'));
+  const reviewed = recordReview(presets.waiting, 'approved', ' PR #12 ');
+  assert.equal(inspect(reviewed).input.reviewReference, 'PR #12');
+  assert.equal(inspect(reviewed).isReady, true);
+  assert.equal(inspect(reviewed).isApproved, false);
+  assert.equal(inspect(reviewed, true).isApproved, true);
+  assert.equal(inspect(recordReview(presets.failure, 'approved', 'PR #12'), true).isApproved, false);
+  assert.equal(inspect(recordReview(reviewed, 'changes', 'PR #13'), true).isApproved, false);
 });

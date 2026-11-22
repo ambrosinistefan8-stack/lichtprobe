@@ -30,15 +30,15 @@ h1 span { color: var(--mint); }
 .scene-label { margin: 0; left: 17px; top: 17px; color: var(--muted); font-size: .79rem; }
 .scene-label > span:first-child { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); margin-right: 5px; box-shadow: 0 0 10px #86f5e0; }
 .scene-caption { left: 17px; bottom: 19px; max-width: calc(100% - 34px); }
-.scene-caption strong { display: block; margin-top: 4px; font-size: 1.16rem; letter-spacing: -.025em; }
+.scene-caption strong { display: block; margin-top: 4px; font-size: 1.16rem; letter-spacing: -.025em; overflow-wrap: anywhere; }
 .operator { background: var(--panel); padding: clamp(18px, 3vw, 30px); border-left: 1px solid var(--line); }
 .operator-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
 h2 { margin: 0; font-size: 1.17rem; letter-spacing: -.025em; }
 #run-counter { color: var(--mint); font: .77rem ui-monospace, monospace; white-space: nowrap; }
 label { display: block; color: var(--muted); font-size: .82rem; margin-bottom: 6px; }
-button, select, .file-button { font: inherit; border: 1px solid var(--line); color: var(--text); border-radius: 8px; background: #152429; min-height: 41px; }
+button, select, input[type='text'], .file-button { font: inherit; border: 1px solid var(--line); color: var(--text); border-radius: 8px; background: #152429; min-height: 41px; }
 button, .file-button { cursor: pointer; }
-button:focus-visible, select:focus-visible, .file-button:focus-within, a:focus-visible, .file-button:has(+ #file:focus-visible) { outline: 2px solid var(--mint); outline-offset: 3px; }
+button:focus-visible, select:focus-visible, input[type='text']:focus-visible, .file-button:focus-within, a:focus-visible, .file-button:has(+ #file:focus-visible) { outline: 2px solid var(--mint); outline-offset: 3px; }
 button:hover:not(:disabled), select:hover, .file-button:hover { border-color: #85d5ce; }
 select { display: block; width: 100%; padding: 8px 11px; }
 .subtle { padding: 5px 10px; color: var(--muted); background: #101a1d; font-size: .81rem; white-space: nowrap; }
@@ -54,6 +54,10 @@ select { display: block; width: 100%; padding: 8px 11px; }
 .primary, .secondary { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 8px 13px; font-size: .87rem; font-weight: 650; }
 .primary { justify-content: space-between; background: var(--mint); border-color: var(--mint); color: #091614; margin-bottom: 6px; }
 .operator > button { width: 100%; }
+#review-form { margin-bottom: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+#review-form :is(input, select, button) { width: 100%; }
+#review-form :is(input, select) { margin-bottom: 10px; }
+#review-form input { padding: 8px 11px; }
 .secondary { background: #15252b; }
 button:disabled { opacity: .52; cursor: not-allowed; }
 #status { min-height: 2.6em; margin: 10px 0 0; font-size: .81rem; color: var(--muted); line-height: 1.45; }

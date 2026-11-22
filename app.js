@@ -3,7 +3,8 @@
 const model = window.releaseModel;
 const byId = (id) => document.getElementById(id);
 const ui = Object.fromEntries(['scenario', 'stage', 'scene-source', 'scene-step', 'scene-title',
-  'timeline', 'run-counter', 'status', 'run', 'approve', 'export', 'file', 'music'].map(id => [id, byId(id)]));
+  'timeline', 'run-counter', 'status', 'run', 'approve', 'export', 'file', 'music',
+  'review-form', 'review-reference', 'review-decision'].map(id => [id, byId(id)]));
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const colors = { pass: '#87efdb', blocked: '#ffa298', waiting: '#f3c88c', idle: '#8aa8fe' };
 const statusText = { pass: 'OK', blocked: 'BLOCKIERT', waiting: 'OFFEN', idle: 'BEREIT' };
@@ -13,6 +14,7 @@ let report = model.inspect(input);
 let completed = 0;
 let selected = 0;
 let playing = false;
+let isImported = false;
 let timer;
 
 function render() {
@@ -22,6 +24,7 @@ function render() {
   ui['scene-title'].textContent = selected < completed ? report.stages[selected].detail : 'Bereit für den Test';
   ui.approve.disabled = playing || completed !== model.steps.length || !report.isReady || report.isApproved;
   ui.export.disabled = completed !== model.steps.length || playing;
+  ui['review-form'].hidden = !isImported || completed !== model.steps.length || report.isApproved;
   ui.timeline.replaceChildren(...model.steps.map((name, index) => {
     const item = document.createElement('li');
     const button = document.createElement('button');
@@ -47,10 +50,14 @@ function render() {
   }));
 }
 
-function prepare(next, nextSource) {
+function prepare(next, nextSource, imported = false) {
+  const validated = model.validate(next);
   clearTimeout(timer);
-  input = model.validate(next);
+  input = validated;
   source = nextSource;
+  isImported = imported;
+  ui['review-reference'].value = input.reviewReference || '';
+  ui['review-decision'].value = input.review === 'pending' ? '' : input.review;
   report = model.inspect(input);
   completed = 0;
   selected = 0;
@@ -69,16 +76,35 @@ function advance() {
   if (playing) {
     timer = setTimeout(advance, 610);
   } else {
-    ui.status.textContent = report.isReady ? 'Alle Prüfpunkte erfüllt. Deine Freigabe ist möglich.' : 'Freigabe gesperrt. Wähle einen Prüfschritt für Details.';
+    updateCompletionStatus();
   }
+}
+
+function updateCompletionStatus() {
+  if (report.isReady) ui.status.textContent = 'Alle Prüfpunkte erfüllt. Deine Freigabe ist möglich.';
+  else if (isImported && input.review === 'pending') ui.status.textContent = 'Freigabe gesperrt. Erfasse den unabhängigen Review und prüfe die offenen Schritte.';
+  else ui.status.textContent = 'Freigabe gesperrt. Wähle einen Prüfschritt für Details.';
 }
 
 ui.scenario.addEventListener('change', () => prepare(model.presets[ui.scenario.value], 'Synthetischer Prüflauf'));
 ui.run.addEventListener('click', () => {
-  prepare(input, source);
+  prepare(input, source, isImported);
   ui.status.textContent = 'Prüflauf läuft …';
   if (reducedMotion.matches) completed = model.steps.length - 1;
   advance();
+});
+ui['review-form'].addEventListener('submit', event => {
+  event.preventDefault();
+  if (ui['review-form'].hidden) return;
+  try {
+    input = model.recordReview(input, ui['review-decision'].value, ui['review-reference'].value);
+    report = model.inspect(input);
+    selected = model.steps.indexOf('Review');
+    render();
+    updateCompletionStatus();
+  } catch (error) {
+    ui.status.textContent = error.message;
+  }
 });
 ui.approve.addEventListener('click', () => {
   report = model.inspect(input, true);
@@ -91,7 +117,7 @@ ui.file.addEventListener('change', async () => {
   if (!file) return;
   try {
     if (file.size > 128 * 1024) throw new Error('Die Prüfdatei darf höchstens 128 KiB gross sein.');
-    prepare(JSON.parse(await file.text()), 'Lokal importierte Prüfdaten');
+    prepare(JSON.parse(await file.text()), 'Lokal importierte Prüfdaten', true);
   } catch (error) {
     ui.status.textContent = error instanceof SyntaxError ? 'Die Datei enthält kein gültiges JSON.' : error.message;
   } finally {
