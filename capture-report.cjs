@@ -10,12 +10,25 @@ async function main() {
   }
   const stream = run({ files: [path.join(__dirname, 'tests.cjs')] });
   const tests = [];
-  for await (const event of stream) {
-    if ((event.type === 'test:pass' || event.type === 'test:fail') && event.data.nesting === 0) {
-      if (event.data.details?.type !== 'suite') {
-        tests.push({ name: event.data.name.slice(0, 80), passed: event.type === 'test:pass' && !event.data.skip && !event.data.todo });
-      }
+  // Node reports children before their parent. Each slot tracks the results of one parent's children.
+  const childFailures = [];
+  for await (const { type, data } of stream) {
+    if (type !== 'test:pass' && type !== 'test:fail') continue;
+
+    const { details, nesting, name, skip, todo } = data;
+    const passed = type === 'test:pass' && !skip && !todo;
+    const hasChildren = childFailures[nesting] !== undefined;
+    const hasFailedChild = childFailures[nesting] === true;
+    childFailures.length = nesting;
+    if (nesting > 0) {
+      const parentDepth = nesting - 1;
+      childFailures[parentDepth] = childFailures[parentDepth] === true || !passed;
     }
+
+    if (passed && (hasChildren || details?.type === 'suite')) continue;
+    if (hasFailedChild && details?.error?.failureType === 'subtestsFailed') continue;
+
+    tests.push({ name: name.slice(0, 80), passed });
   }
   const report = validate({
     name: 'Lichtprobe – Node-Testlauf',

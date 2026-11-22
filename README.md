@@ -4,8 +4,10 @@ Lichtprobe is a local release rehearsal for small teams. It shows why a release 
 
 Open `index.html` in a modern browser. Select the failed-test scenario, start the run, and check that approval is disabled. The clean scenario leaves the last decision with the operator. The examples use fictional evidence.
 
-Run `node --test tests.cjs` to verify the release gate. A Node.js version with the built-in test runner is sufficient.
+Run `node --test tests.cjs capture-report.test.cjs` to verify the release gate and the report collector. Use Node.js 24 or later.
 
 ## Import a fresh local test report
 
-Run `node capture-report.cjs report.json` and import that file into Lichtprobe. Use `--preview-checked` only after actually checking the preview. The independent review remains pending. Existing output files are preserved.
+Run `node capture-report.cjs report.json` and import that file into Lichtprobe. Use `--preview-checked` only after actually checking the preview. Existing output files are preserved.
+
+Play the report to see the pending review. Once an independent reviewer has decided, enter the reference and their decision under **Review erfassen**. If the preview, tests and review all pass, the operator can then select **Im Labor freigeben** as a separate step. The exported report includes the review reference. Lichtprobe records the review the operator enters, and relies on the operator to verify its source.
