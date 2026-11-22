@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Lichtprobe | Release-Prüflabor</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="model.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="wordmark" href="./index.html"><span class="logo" aria-hidden="true"></span> SPINNENNETZ-DNA</a>
+    <button type="button" class="subtle" id="music" aria-pressed="false"><span aria-hidden="true">♫</span> Musik aus</button>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="title">
+      <p class="overline">RELEASE-PRÜFLABOR</p>
+      <h1 id="title">Lichtprobe<span>.</span></h1>
+      <p>Vorschau, Tests und Review in einem Prüflauf. Du entscheidest, wann ein Release bereit ist.</p>
+    </section>
+    <section class="console" aria-label="Prüflauf">
+      <div class="viewport">
+        <canvas id="stage" aria-hidden="true"></canvas>
+        <p class="scene-label"><span aria-hidden="true"></span> <span id="scene-source">Synthetischer Prüflauf</span></p>
+        <div class="scene-caption">
+          <span id="scene-step" class="overline">VORSCHAU PRÜFEN</span>
+          <strong id="scene-title">Bereit für den Test</strong>
+        </div>
+      </div>
+      <div class="operator">
+        <div class="operator-title"><h2>Prüflauf starten</h2><span id="run-counter">0 / 4</span></div>
+        <label for="scenario">Prüfbeispiel</label>
+        <select id="scenario">
+          <option value="ready">A · Sauberer Kandidat</option>
+          <option value="failure">B · Fehlgeschlagener Test</option>
+          <option value="waiting">C · Review ausstehend</option>
+        </select>
+        <ol class="timeline" id="timeline" aria-label="Prüfschritte"></ol>
+        <button type="button" class="primary" id="run">Prüflauf abspielen <span aria-hidden="true">▶</span></button>
+        <button type="button" class="secondary" id="approve" disabled>Im Labor freigeben</button>
+        <p id="status" role="status" aria-live="polite">Wähle ein Beispiel und starte den Prüflauf.</p>
+      </div>
+    </section>
+    <section class="tools" aria-label="Nachweise">
+      <div><h2>Prüfbericht</h2><p>Eigene Prüfdaten können als JSON lokal eingelesen werden.</p></div>
+      <div class="tool-actions">
+        <label for="file" class="secondary file-button">JSON einlesen</label><input id="file" type="file" accept="application/json,.json">
+        <button type="button" class="secondary" id="export" disabled>Bericht speichern</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
